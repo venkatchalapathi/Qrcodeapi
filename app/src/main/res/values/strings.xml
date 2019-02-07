@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Qrcodeapi</string>
+    <string name="result_text">please focus on qr code</string>
+</resources>
