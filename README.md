@@ -8,7 +8,7 @@
    
    
    
-# Add xml code 
+Add xml code 
 
    
        
@@ -67,3 +67,56 @@
                 .build();
         cameraSource = new CameraSource.Builder(this, barcodeDetector)
                 .setRequestedPreviewSize(640, 480).build();
+                
+                
+  Create Surfaceview
+  
+      surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder surfaceHolder) {
+                if (ActivityCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(MainActivity.this,
+                            new String[]{Manifest.permission.CAMERA},requestid);
+                    return;
+                }
+                try {
+                    cameraSource.start(surfaceView.getHolder());
+                } catch (IOException e) {
+
+                }
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+                cameraSource.stop();
+            }
+        });
+
+  Process the barcode
+
+   barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
+            @Override
+            public void release() {
+
+            }
+
+            @Override
+            public void receiveDetections(Detector.Detections<Barcode> detections) {
+                final SparseArray<Barcode> qrcode=detections.getDetectedItems();
+                if (qrcode.size()!=0){
+                    textView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Vibrator vibrator=(Vibrator)getApplicationContext().getSystemService(VIBRATOR_SERVICE);
+                            vibrator.vibrate(1000);
+                            textView.setText(qrcode.valueAt(0).displayValue);
+                        }
+                    });
+                }
+            }
+        });
